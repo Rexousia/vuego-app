@@ -23,10 +23,26 @@
           </li>
           <li class="nav-item">
             <!-- Linking to '/login' login inside of router index.js with router link-->
-            <router-link class="nav-link" to="/login">Login</router-link>
+            <router-link v-if="store.token == ''" class="nav-link" to="/login"
+              >Login</router-link
+            >
+            <router-link v-else class="nav-link" to="/logout"
+              >Logout</router-link
+            >
           </li>
         </ul>
       </div>
     </div>
   </nav>
 </template>
+
+<script>
+import { store } from "./store.js";
+export default {
+  data() {
+    return {
+      store,
+    };
+  },
+};
+</script>
