@@ -33,7 +33,6 @@
             required="true"
           ></text-input-component>
           <hr />
-          Email: {{ email }}
           <hr />
           <!-- Submit button for the form -->
           <input type="submit" class="btn btn-primary" value="login" />
@@ -48,6 +47,8 @@
 import FormTagComponent from "./forms/FormTagComponent.vue";
 import TextInputComponent from "./forms/TextInputComponent.vue";
 import { store } from "./store.js";
+import router from "./../router/index.js";
+import notie from "notie";
 export default {
   //name the components use of exportation
   name: "LoginComponent",
@@ -81,17 +82,45 @@ export default {
         body: JSON.stringify(payload),
       };
 
-      // Send the POST request to the server
+      // Send a POST request to the server at the specified URL.
       fetch("http://localhost:8081/users/login", requestOptions)
+        // The server returns a response. If the response is successful (status code in the 200-299 range),
+        // the response's JSON payload is parsed and passed to the next then() block.
         .then((response) => response.json())
+        // If the response contains an "error" field, log the error message and display an error alert.
+        // Otherwise, log the data object and update the store with the data from the response.
         .then((response) => {
-          // If there's an error, log the error message
           if (response.error) {
             console.log("Error:", response.message);
+            notie.alert({
+              type: "error",
+              text: response.message,
+              //stay: true, (want the alert to stay)
+              //position: 'bottom', (where do you want the alert displayed)
+            });
           } else {
-            // If there's no error, log the data object
             console.log("Token", response.data.token.token);
             store.token = response.data.token.token;
+
+            store.user = {
+              id: response.data.user.id,
+              first_name: response.data.user.first_name,
+              last_name: response.data.user.last_name,
+              email: response.data.user.email,
+            };
+            // Save the response data to a cookie with the name "_site_data".
+            let date = new Date();
+            let expDays = 1;
+            date.setTime(date.getTime() + expDays * 24 * 60 * 1000);
+            const expires = "expires=" + date.toUTCString();
+            document.cookie =
+              "_site_data=" +
+              JSON.stringify(response.data) +
+              "; " +
+              expires +
+              "; path=/; SameSite=strict; Secure;";
+            // Redirect to the home page.
+            router.push("/");
           }
         });
     },
