@@ -21,6 +21,65 @@
               >Home</router-link
             >
           </li>
+
+          <li class="nav-item">
+            <router-link class="nav-link active" to="/books">Books</router-link>
+          </li>
+
+          <!-- This element will only be displayed if the store's token property is not an empty string -->
+          <li v-if="store.token !== ''" class="nav-item dropdown">
+            <!-- This is a dropdown menu for the Admin menu item -->
+            <a
+              class="nav-link dropdown-toggle"
+              href="#"
+              id="navBarDropDown"
+              role="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              Admin</a
+            >
+            <!-- This is the dropdown menu that appears when the Admin menu item is clicked -->
+            <!-- aria-labelledby is an attribute of the ul element. 
+            It is used to associate the dropdown menu with its trigger element, 
+            which is the a element with the nav-link dropdown-toggle classes. -->
+            <ul class="dropdown-menu" aria-labelledby="navBarDropDown">
+              <!-- This is a menu item that links to the Manage Users page -->
+              <li>
+                <router-link class="dropdown-item" to="/admin/users">
+                  Manager Users
+                </router-link>
+              </li>
+              <!-- This is a menu item that links to the Add User page -->
+              <li>
+                <!--  Specifying redirect to when they click on the link. Adding user by adding "0"
+                PostgreSQL starts counting at one -->
+                <router-link class="dropdown-item" to="/admin/users/0">
+                  Add User
+                </router-link>
+              </li>
+              <!-- This is a menu item that links to the Manage Books page -->
+              <li>
+                <router-link class="dropdown-item" to="/admin/books">
+                  Manage Books
+                </router-link>
+              </li>
+              <!-- This is a menu item that links to the Add Book page -->
+              <li>
+                <!-- :to="{ name: 'BookEditComponent', params: { bookId: 0 } }"
+                      - Binding for router-link component that specifies destination route and any additional data or parameters to be passed to the route
+                      - name: Name of component to be rendered by the route
+                      - params: Object containing data or parameters to be passed to the component-->
+                <router-link
+                  class="dropdown-item"
+                  :to="{ name: 'BookEditComponent', params: { bookId: 0 } }"
+                >
+                  Add Book
+                </router-link>
+              </li>
+            </ul>
+          </li>
+
           <li class="nav-item">
             <!-- Linking to '/login' login inside of router index.js with router link-->
             <router-link v-if="store.token == ''" class="nav-link" to="/login"
@@ -36,6 +95,7 @@
           </li>
         </ul>
 
+        <!-- This element displays the first name of the user from the store, or an empty string if the user's first name is not defined -->
         <span class="navbar-text">
           {{ store.user.first_name ?? "" }}
         </span>
@@ -47,6 +107,7 @@
 <script>
 import { store } from "./store.js";
 import router from "./../router/index.js";
+import Security from "./security.js";
 export default {
   data() {
     return {
@@ -60,14 +121,15 @@ export default {
         token: store.token,
       };
 
-      // Define request options object with method and body properties
-      const requestOption = {
-        method: "POST",
-        body: JSON.stringify(payload),
-      };
-
       // Send POST request to server with request options
-      fetch("http://localhost:8081/users/logout", requestOption)
+      // This line makes a fetch request to the logout API endpoint of the application's backend server,
+      // passing in the request options created by the Security module's requestOptions function.
+      // The API URL is stored in the VUE_APP_API_URL environment variable,
+      // which is set in the application's configuration.
+      fetch(
+        process.env.VUE_APP_API_URL + "/users/logout",
+        Security.requestOptions(payload)
+      )
         .then((response) => {
           // Parse response as JSON
           return response.json();

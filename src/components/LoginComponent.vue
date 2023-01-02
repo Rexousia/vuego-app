@@ -49,6 +49,7 @@ import TextInputComponent from "./forms/TextInputComponent.vue";
 import { store } from "./store.js";
 import router from "./../router/index.js";
 import notie from "notie";
+import Security from "./security.js";
 export default {
   //name the components use of exportation
   name: "LoginComponent",
@@ -68,22 +69,22 @@ export default {
   methods: {
     // Method that is called when the "myevent" event is emitted by the FormTagComponent
     submitHandler() {
-      console.log("submitHandler called - success!");
-
       // Create the payload object with the email and password fields
       const payload = {
         email: this.email,
         password: this.password,
       };
 
-      // Set the request options for the POST request
-      const requestOptions = {
-        method: "POST",
-        body: JSON.stringify(payload),
-      };
-
       // Send a POST request to the server at the specified URL.
-      fetch("http://localhost:8081/users/login", requestOptions)
+      // This line makes a fetch request to the login API endpoint of the application's
+      // backend server,
+      // passing in the request options created by the Security module's requestOptions function.
+      // The API URL is stored in the VUE_APP_API_URL environment variable,
+      // which is set in the application's configuration.
+      fetch(
+        process.env.VUE_APP_API_URL + "/users/login",
+        Security.requestOptions(payload)
+      )
         // The server returns a response. If the response is successful (status code in the 200-299 range),
         // the response's JSON payload is parsed and passed to the next then() block.
         .then((response) => response.json())
@@ -91,7 +92,6 @@ export default {
         // Otherwise, log the data object and update the store with the data from the response.
         .then((response) => {
           if (response.error) {
-            console.log("Error:", response.message);
             notie.alert({
               type: "error",
               text: response.message,
@@ -99,7 +99,6 @@ export default {
               //position: 'bottom', (where do you want the alert displayed)
             });
           } else {
-            console.log("Token", response.data.token.token);
             store.token = response.data.token.token;
 
             store.user = {

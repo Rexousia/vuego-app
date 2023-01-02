@@ -60,8 +60,33 @@ export default {
       };
     }
   },
+  mounted() {
+    // using token auth to prevent access
+    // create an object with a foo property
+    // const payload = {
+    //   foo: "bar",
+    // };
+    // // create a new Headers object and add two headers: Content-Type and Authorization
+    // const headers = new Headers();
+    // headers.append("Content-Type", "application/json");
+    // headers.append("Authorization", "Bearer " + store.token); // store.token is the value of the token
+    // // create an object with request options
+    // const requestOptions = {
+    //   method: "POST", // specify the request method as POST
+    //   body: JSON.stringify(payload), // stringify the payload object and set it as the request body
+    //   headers: headers, // set the headers object as the request headers
+    // };
+    // // send a POST request to the specified URL with the specified request options
+    // fetch("http://localhost:8081/admin/foo", requestOptions)
+    //   .then((response) => response.json()) // parse the response as JSON
+    //   .then((data) => {
+    //     console.log(data); // log the data object
+    //   });
+  },
 };
 </script>
 
 <style>
 </style>
+
+
